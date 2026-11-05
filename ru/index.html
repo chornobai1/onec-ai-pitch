@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta property="og:title" content="onec-ai — AI, который знает вашу конфигурацию 1С">
+<meta property="og:description" content="MCP-сервер для разработчиков, аналитиков и поддержки 1С: ответы с цитатами из вашего кода.">
+<meta property="og:type" content="website">
+<title>onec-ai — AI для команд 1С</title>
+<meta name="description" content="onec-ai: MCP-сервер, который даёт AI-ассистентам знания о вашей конфигурации 1С — для разработчиков, аналитиков и поддержки.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090d;
+  --bg-2:#0b0e14;
+  --surface:#11151d;
+  --chart-surface:#141821;
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.14);
+  --text:#f3f5f7;
+  --text-2:#aab2bf;
+  --muted:#6f7887;
+  --lime:#c6f24e;
+  --lime-dim:rgba(198,242,78,.12);
+  --violet:#a796ff;
+  --violet-dim:rgba(167,150,255,.13);
+  --cyan:#5cd8ee;
+  --cyan-dim:rgba(92,216,238,.12);
+  --rose:#ff8a8a;
+  /* chart marks — validated for the dark chart surface */
+  --c-dev:#6ea606;
+  --c-an:#7d5cff;
+  --c-sup:#1c9fd0;
+  --grid:rgba(255,255,255,.08);
+  --f-display:"Unbounded","Manrope",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f-body);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ---------- stage & slides ---------- */
+.stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;transform:translate(-50%,-50%) scale(.5)}
+.slide{position:absolute;inset:0;padding:84px 112px 110px;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--bg);opacity:0;visibility:hidden;transition:opacity .55s ease,visibility 0s linear .55s}
+.slide.active{opacity:1;visibility:visible;transition:opacity .55s ease,visibility 0s}
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(900px 620px at var(--g1x,82%) var(--g1y,12%),var(--g1c,rgba(125,92,255,.20)),transparent 70%),
+    radial-gradient(760px 560px at var(--g2x,8%) var(--g2y,96%),var(--g2c,rgba(198,242,78,.09)),transparent 70%)}
+.slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:80px 80px;
+  -webkit-mask-image:radial-gradient(ellipse 70% 60% at 70% 30%,#000 10%,transparent 75%);
+          mask-image:radial-gradient(ellipse 70% 60% at 70% 30%,#000 10%,transparent 75%)}
+.slide > *{position:relative;z-index:1}
+.g-cyan{--g1c:rgba(28,159,208,.20);--g2c:rgba(125,92,255,.10)}
+.g-lime{--g1c:rgba(198,242,78,.13);--g2c:rgba(28,159,208,.10)}
+.g-left{--g1x:12%;--g1y:8%;--g2x:92%;--g2y:92%}
+.g-center{--g1x:50%;--g1y:-10%}
+
+.foot{position:absolute;left:112px;right:112px;bottom:40px;display:flex;justify-content:space-between;align-items:center;
+  font:500 16px/1 var(--f-mono);color:var(--muted);letter-spacing:.06em;z-index:1}
+.foot .wm{display:flex;align-items:center;gap:10px;color:var(--text-2)}
+.foot .wm svg{width:22px;height:22px}
+
+/* ---------- type ---------- */
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font:600 18px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--lime);margin-bottom:28px}
+.eyebrow::before{content:"";width:10px;height:10px;border-radius:50%;background:currentColor;box-shadow:0 0 18px currentColor}
+.eyebrow.v{color:var(--violet)} .eyebrow.c{color:var(--cyan)}
+h1{font:600 86px/1.06 var(--f-display);letter-spacing:-.025em}
+h2{font:600 58px/1.1 var(--f-display);letter-spacing:-.02em;max-width:1500px}
+h3{font:700 28px/1.25 var(--f-body);letter-spacing:-.005em}
+.hl{background:linear-gradient(92deg,var(--lime) 0%,#9ef0b0 45%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hl-v{background:linear-gradient(92deg,var(--violet),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font:500 30px/1.45 var(--f-body);color:var(--text-2);max-width:1200px}
+.p{font:500 23px/1.5 var(--f-body);color:var(--text-2)}
+.small{font:500 18px/1.45 var(--f-body);color:var(--muted)}
+.mono{font-family:var(--f-mono)}
+.head{margin-bottom:52px}
+.head .lead{margin-top:22px}
+.body{flex:1;min-height:0}
+.src{font:500 16px/1.4 var(--f-mono);color:var(--muted)}
+
+/* ---------- reveal ---------- */
+.r{opacity:0;transform:translateY(26px);transition:opacity .75s cubic-bezier(.2,.7,.2,1),transform .75s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--d,0) * 90ms + 120ms)}
+.slide.active .r{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .r,.slide{transition:none!important}
+  .r{opacity:1;transform:none}
+  *{animation:none!important}
+}
+
+/* ---------- components ---------- */
+.card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border:1px solid var(--line);border-radius:26px;padding:34px 36px;position:relative}
+.card.glow-l{border-color:rgba(198,242,78,.28);box-shadow:0 0 0 1px rgba(198,242,78,.06),0 30px 80px -40px rgba(198,242,78,.35)}
+.card.glow-v{border-color:rgba(167,150,255,.30);box-shadow:0 30px 80px -40px rgba(125,92,255,.45)}
+.card.glow-c{border-color:rgba(92,216,238,.28);box-shadow:0 30px 80px -40px rgba(28,159,208,.45)}
+.ico{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:var(--lime-dim);color:var(--lime);flex:none}
+.ico svg{width:30px;height:30px}
+.ico.v{background:var(--violet-dim);color:var(--violet)}
+.ico.c{background:var(--cyan-dim);color:var(--cyan)}
+.ico.m{background:rgba(255,255,255,.06);color:var(--text-2)}
+svg.i{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:12px 20px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.04);font:600 21px/1 var(--f-body);color:var(--text)}
+.chip svg{width:22px;height:22px}
+.tool{display:inline-flex;align-items:center;padding:7px 12px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid var(--line);font:500 16px/1 var(--f-mono);color:var(--text-2);white-space:nowrap}
+.tool.l{color:var(--lime);border-color:rgba(198,242,78,.25);background:var(--lime-dim)}
+.tool.v{color:var(--violet);border-color:rgba(167,150,255,.28);background:var(--violet-dim)}
+.tool.c{color:var(--cyan);border-color:rgba(92,216,238,.25);background:var(--cyan-dim)}
+.checks{list-style:none;display:flex;flex-direction:column;gap:20px}
+.checks li{display:flex;gap:16px;align-items:flex-start;font:500 23px/1.4 var(--f-body);color:var(--text)}
+.checks li svg{width:26px;height:26px;flex:none;margin-top:2px;color:var(--lime)}
+.checks.v li svg{color:var(--violet)} .checks.c li svg{color:var(--cyan)}
+.tag{display:inline-block;font:600 15px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.06);color:var(--text-2)}
+.num{font:600 64px/1 var(--f-display);letter-spacing:-.02em}
+.num small{font-size:.5em;font-weight:600;margin-left:6px;color:var(--text-2)}
+
+/* ---------- slide 1 ---------- */
+.s-title{flex-direction:row;align-items:center;gap:40px}
+.s-title .left{flex:1.3;display:flex;flex-direction:column;justify-content:center}
+.s-title .right{flex:.7;display:grid;place-items:center}
+.brand{display:flex;align-items:center;gap:16px;font:600 30px/1 var(--f-display);margin-bottom:64px}
+.brand svg{width:48px;height:48px}
+.s-title .lead{margin:36px 0 52px;max-width:960px}
+.chips{display:flex;gap:16px;flex-wrap:wrap}
+.orbit{width:640px;height:640px}
+.orbit .ring{fill:none;stroke:rgba(255,255,255,.10);stroke-width:1.5;stroke-dasharray:4 10;transform-origin:380px 380px;animation:spin 80s linear infinite}
+.orbit .ring.b{animation-duration:120s;animation-direction:reverse;stroke:rgba(198,242,78,.18)}
+.orbit .edge{stroke:rgba(167,150,255,.45);stroke-width:1.6;stroke-dasharray:6 8;animation:dash 3.5s linear infinite}
+.orbit .edge.l{stroke:rgba(198,242,78,.45)}
+.orbit .edge.c{stroke:rgba(92,216,238,.45)}
+.orbit .node rect{fill:#141924;stroke:rgba(255,255,255,.16);stroke-width:1.5}
+.orbit .node text{font:600 19px var(--f-body);fill:var(--text);text-anchor:middle;dominant-baseline:central}
+.orbit .dot{fill:var(--lime)}
+.orbit .pulse{transform-origin:380px 380px;animation:pulse 3.2s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes dash{to{stroke-dashoffset:-56}}
+@keyframes pulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+.date-line{margin-top:80px;font:500 18px/1 var(--f-mono);color:var(--muted);letter-spacing:.08em}
+
+/* ---------- slide 2 ---------- */
+.s-problem .body{display:grid;grid-template-columns:560px 1fr;gap:56px}
+.bigstats{display:flex;flex-direction:column;gap:30px;justify-content:center}
+.bigstat .v{font:600 76px/1 var(--f-display);letter-spacing:-.03em}
+.bigstat .k{font:500 22px/1.35 var(--f-body);color:var(--text-2);margin-top:8px}
+.pains{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.pain{display:flex;flex-direction:column;gap:16px;padding:30px 32px}
+.pain .t{display:flex;align-items:center;gap:16px}
+.pain .p{font-size:21px}
+.banner{margin-top:30px;display:flex;align-items:center;gap:34px;padding:26px 36px;border-radius:22px;border:1px solid rgba(255,138,138,.25);background:linear-gradient(90deg,rgba(255,138,138,.10),rgba(255,138,138,.02))}
+.banner .v{font:600 64px/1 var(--f-display);color:var(--rose);white-space:nowrap}
+.banner .t{font:600 25px/1.35 var(--f-body)}
+
+/* ---------- slide 3 ---------- */
+.vs{display:grid;grid-template-columns:260px 1fr 1fr;border-radius:26px;overflow:hidden;border:1px solid var(--line)}
+.vs > div{padding:30px 32px;border-top:1px solid var(--line);font:500 24px/1.4 var(--f-body);display:flex;gap:14px;align-items:flex-start}
+.vs .hd{border-top:0;font:600 24px/1.2 var(--f-display);padding:28px 30px;align-items:center}
+.vs .k{color:var(--muted);font:600 17px/1.4 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;align-items:center}
+.vs .bad{color:var(--text-2);background:rgba(255,255,255,.015)}
+.vs .good{background:linear-gradient(90deg,rgba(198,242,78,.07),rgba(198,242,78,.02));color:var(--text)}
+.vs .bad svg{color:var(--rose);width:24px;height:24px;flex:none;margin-top:3px}
+.vs .good svg{color:var(--lime);width:24px;height:24px;flex:none;margin-top:3px}
+.vs .hd.good{color:var(--lime)}
+
+/* ---------- slide 4 ---------- */
+.flow{display:grid;grid-template-columns:1fr 70px 1.15fr 70px 1fr 70px 1fr;align-items:stretch}
+.flow .arrow{display:grid;place-items:center;color:var(--muted)}
+.flow .arrow svg{width:40px;height:40px}
+.fbox{display:flex;flex-direction:column;gap:18px;padding:30px 30px}
+.fbox h3{font-size:26px}
+.fbox ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.fbox li{font:500 20px/1.35 var(--f-body);color:var(--text-2);display:flex;gap:10px;align-items:center}
+.fbox li::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.7;flex:none}
+.fbox.core{background:radial-gradient(120% 120% at 50% 0%,rgba(198,242,78,.14),rgba(198,242,78,.02) 60%),#0e1218}
+.fbox .mcp{margin-top:auto;font:600 16px/1 var(--f-mono);color:var(--muted);letter-spacing:.1em}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:40px}
+.pillar{display:flex;gap:18px;align-items:flex-start;padding:26px 28px}
+.pillar .p{font-size:20px}
+.pillar h3{font-size:23px;margin-bottom:6px}
+
+/* ---------- slide 5 ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;position:relative;flex:1;min-height:0}
+.step{padding:36px 32px;display:flex;flex-direction:column;gap:18px}
+.step .n{font:600 20px/1 var(--f-mono);color:var(--lime);letter-spacing:.1em}
+.step h3{font-size:29px}
+.step .p{font-size:22px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:30px}
+.metric{padding:26px 30px;border-radius:22px;border:1px dashed var(--line-2)}
+.metric .v{font:600 44px/1 var(--f-display);letter-spacing:-.02em}
+.metric .k{font:500 19px/1.35 var(--f-body);color:var(--text-2);margin-top:12px}
+
+/* ---------- role slides ---------- */
+.role{display:grid;grid-template-columns:1fr 860px;gap:64px;flex:1;min-height:0}
+.role .left{display:flex;flex-direction:column}
+.role .effect{margin-top:auto;padding:24px 28px;border-radius:20px;background:rgba(255,255,255,.035);border:1px solid var(--line);font:600 21px/1.45 var(--f-body);color:var(--text)}
+.role .effect b{color:var(--lime)}
+.prompts{display:flex;flex-direction:column;gap:18px;justify-content:center}
+.prompt{padding:24px 28px;border-radius:22px;background:#10141c;border:1px solid var(--line);display:flex;flex-direction:column;gap:16px}
+.prompt .q{display:flex;gap:16px;font:600 23px/1.4 var(--f-body)}
+.prompt .q .av{width:38px;height:38px;border-radius:12px;flex:none;display:grid;place-items:center;font:700 16px/1 var(--f-mono)}
+.prompt .tools{display:flex;gap:10px;flex-wrap:wrap;padding-left:54px}
+
+/* ---------- slide 8 ---------- */
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;position:relative;margin-top:10px}
+.timeline::before{content:"";position:absolute;left:4%;right:4%;top:52px;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--lime));opacity:.55}
+.tl{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+.tl .ball{width:104px;height:104px;border-radius:26px;display:grid;place-items:center;background:#0f141c;border:1px solid var(--line-2);color:var(--cyan);position:relative}
+.tl .ball svg{width:44px;height:44px}
+.tl .ball b{position:absolute;top:-10px;right:-10px;width:32px;height:32px;border-radius:50%;background:var(--cyan);color:#05121a;font:700 16px/32px var(--f-mono);text-align:center}
+.tl h3{font-size:29px;margin-top:10px}
+.tl .p{font-size:22px}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:auto}
+.ba .card{padding:28px 32px}
+.ba .lbl{font:600 16px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+.ba .before .lbl{color:var(--rose)} .ba .after .lbl{color:var(--lime)}
+.ba .p{font-size:23px;color:var(--text)}
+
+/* ---------- slide 9 chat ---------- */
+.demo{display:grid;grid-template-columns:1fr 470px;gap:40px;flex:1;min-height:0}
+.chat{align-self:center;border-radius:28px;border:1px solid var(--line-2);background:#0d1118;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 120px -60px rgba(125,92,255,.6)}
+.chat .bar{display:flex;align-items:center;gap:10px;padding:16px 22px;border-bottom:1px solid var(--line);font:500 16px/1 var(--f-mono);color:var(--muted)}
+.chat .bar i{width:12px;height:12px;border-radius:50%;background:#2a303b;display:block}
+.chat .bar span{margin-left:12px}
+.chat .msgs{padding:30px 34px;display:flex;flex-direction:column;gap:24px}
+.msg-u{align-self:flex-end;max-width:84%;padding:20px 24px;border-radius:22px 22px 6px 22px;background:linear-gradient(135deg,#2a2258,#1d2a44);font:500 23px/1.45 var(--f-body)}
+.log{display:flex;flex-direction:column;gap:11px;font:500 19px/1.3 var(--f-mono);color:var(--text-2)}
+.log div{display:flex;gap:12px;align-items:center}
+.log svg{width:18px;height:18px;color:var(--lime);flex:none}
+.log em{font-style:normal;color:var(--muted)}
+.msg-a{padding:26px 30px;border-radius:22px 22px 22px 6px;background:#141a24;border:1px solid var(--line);font:500 22px/1.55 var(--f-body);color:var(--text-2)}
+.msg-a p+p{margin-top:12px}
+.msg-a b{color:var(--text);font-weight:700}
+.msg-a code{font:500 19px/1 var(--f-mono);color:var(--cyan);background:rgba(92,216,238,.08);padding:3px 7px;border-radius:6px}
+.notes{display:flex;flex-direction:column;gap:18px;justify-content:center}
+.note{display:flex;gap:18px;align-items:flex-start;padding:24px 26px}
+.note h3{font-size:22px;margin-bottom:6px}
+.note .p{font-size:19px}
+
+/* ---------- slide 10 scale ---------- */
+.scale{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;flex:1;min-height:0}
+.scol{display:flex;flex-direction:column;gap:14px;padding:32px 34px}
+.scol .hdr{display:flex;align-items:center;gap:16px;margin-bottom:12px}
+.scol .hdr h3{font-size:25px}
+.srow{flex:1;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:16px 0;border-top:1px solid var(--line)}
+.srow:first-of-type{border-top:0}
+.srow .v{font:600 42px/1 var(--f-display);letter-spacing:-.02em;white-space:nowrap}
+.srow .k{font:500 19px/1.3 var(--f-body);color:var(--text-2);text-align:right}
+
+/* ---------- slide 11 adoption ---------- */
+.adopt{display:grid;grid-template-columns:520px 1fr;gap:40px;flex:1;min-height:0}
+.kpis{display:grid;grid-template-rows:repeat(4,1fr);gap:16px}
+.kpi{padding:22px 28px;display:flex;flex-direction:column;justify-content:center}
+.kpi .v{font:600 50px/1 var(--f-display);letter-spacing:-.02em}
+.kpi .k{font:500 19px/1.35 var(--f-body);color:var(--text-2);margin-top:10px}
+.charts{display:grid;grid-template-rows:1fr 1fr;gap:16px}
+.chart-card{padding:24px 30px 14px;display:flex;flex-direction:column;background:var(--chart-surface);border:1px solid var(--line);border-radius:26px;position:relative}
+.chart-card h3{font-size:22px}
+.chart-card .sub{font:500 16px/1.3 var(--f-body);color:var(--muted);margin-top:4px}
+.chart-card .plot{flex:1;min-height:0;position:relative;margin-top:6px}
+.chart-card .plot svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.chart-card .bar-mark{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.slide.active .chart-card .bar-mark{transform:scaleY(1)}
+.axis-t{font:500 15px var(--f-mono);fill:var(--muted)}
+.cap-t{font:600 17px var(--f-body);fill:var(--text)}
+.x-t{font:500 16px var(--f-body);fill:var(--text-2)}
+.tip{position:absolute;pointer-events:none;padding:10px 14px;border-radius:10px;background:#1f2531;border:1px solid var(--line-2);font:500 16px/1.35 var(--f-body);color:var(--text);white-space:nowrap;opacity:0;transform:translate(-50%,-100%);transition:opacity .12s}
+.tip b{font-weight:700}
+
+/* ---------- slide 12 calculator ---------- */
+.calc{display:grid;grid-template-columns:640px 1fr;gap:36px;flex:1;min-height:0}
+.calc-in{display:flex;flex-direction:column;justify-content:space-between;gap:22px;padding:34px 38px}
+.field .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.field label{font:600 21px/1.3 var(--f-body)}
+.field output{font:600 28px/1 var(--f-display);color:var(--lime)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;cursor:pointer;--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:8px;background:linear-gradient(90deg,var(--lime) var(--p),rgba(255,255,255,.12) var(--p))}
+input[type=range]::-moz-range-track{height:8px;border-radius:8px;background:rgba(255,255,255,.12)}
+input[type=range]::-moz-range-progress{height:8px;border-radius:8px;background:var(--lime)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--text);border:5px solid var(--lime);margin-top:-10px;box-shadow:0 0 0 6px rgba(198,242,78,.15)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--text);border:5px solid var(--lime)}
+input[type=range]:focus-visible{outline:2px solid var(--cyan);outline-offset:6px;border-radius:8px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.seg button{padding:14px 8px;border-radius:11px;font:600 18px/1 var(--f-body);color:var(--text-2)}
+.seg button.on{background:var(--lime);color:#10140a}
+.seg button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.calc-out{display:flex;flex-direction:column;gap:20px;min-height:0}
+.hero-out{padding:30px 36px;background:radial-gradient(120% 140% at 0% 0%,rgba(198,242,78,.16),rgba(198,242,78,.02) 60%),#0e1218;border-color:rgba(198,242,78,.3)}
+.hero-out .lbl{font:600 17px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+.hero-out .big{font:600 92px/1 var(--f-display);letter-spacing:-.035em;margin:18px 0 12px}
+.hero-out .big small{font-size:.5em;color:var(--text-2);margin-left:10px}
+.hero-out .sub{font:500 22px/1.4 var(--f-body);color:var(--text-2)}
+.hero-out .sub b{color:var(--text)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tile{padding:24px 28px}
+.tile .k{font:500 18px/1.3 var(--f-body);color:var(--text-2)}
+.tile .v{font:600 42px/1 var(--f-display);letter-spacing:-.02em;margin-top:12px}
+.brk{padding:24px 28px;flex:1;display:flex;flex-direction:column;justify-content:center}
+.brk .k{font:500 18px/1.3 var(--f-body);color:var(--text-2);margin-bottom:16px}
+.stack{display:flex;gap:2px;height:44px;border-radius:8px;overflow:hidden;background:var(--chart-surface)}
+.stack div{height:100%;transition:flex-grow .5s cubic-bezier(.2,.7,.2,1);min-width:2px}
+.legend{display:flex;gap:30px;margin-top:16px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:10px;font:500 19px/1 var(--f-body);color:var(--text-2)}
+.legend i{width:14px;height:14px;border-radius:4px;display:block}
+.legend b{color:var(--text);font-weight:700;margin-left:2px}
+.assume{margin-top:22px;font:500 17px/1.5 var(--f-body);color:var(--muted)}
+.assume b{color:var(--text-2)}
+
+/* ---------- slide 13 / 14 grids ---------- */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:22px;flex:1;min-height:0}
+.gcard{display:flex;flex-direction:column;gap:18px;padding:32px 34px}
+.gcard h3{font-size:27px}
+.gcard .p{font-size:21px}
+
+/* ---------- slide 15 deploy ---------- */
+.deploy{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;flex:1;min-height:0}
+.dcard{display:flex;flex-direction:column;gap:18px;padding:36px 36px}
+.dcard h3{font:600 29px/1.15 var(--f-display)}
+.dcard .tag{align-self:flex-start}
+.dcard .p{font-size:21px}
+.dcard .who{margin-top:auto;padding-top:22px;border-top:1px solid var(--line);font:500 19px/1.4 var(--f-body);color:var(--text-2)}
+.dcard .who b{display:block;font:600 15px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.req{margin-top:24px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:20px 26px;border-radius:20px;border:1px dashed var(--line-2)}
+.req .lbl{font:600 16px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:8px}
+
+/* ---------- slide 16 pilot ---------- */
+.plan{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;position:relative;flex:1;min-height:0}
+.phase{padding:36px 34px;display:flex;flex-direction:column;gap:18px}
+.phase .w{font:600 18px/1 var(--f-mono);letter-spacing:.1em;color:var(--lime);text-transform:uppercase}
+.phase h3{font:600 30px/1.15 var(--f-display)}
+.phase .p{font-size:22px}
+.phase .bar{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:auto}
+.phase .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--lime),var(--cyan));border-radius:6px}
+.outcome{margin-top:26px;display:flex;align-items:center;gap:22px;padding:26px 32px;border-radius:22px;background:linear-gradient(90deg,rgba(198,242,78,.10),rgba(92,216,238,.06));border:1px solid rgba(198,242,78,.25)}
+.outcome .p{color:var(--text);font-size:23px}
+
+/* ---------- slide 17 cta ---------- */
+.s-cta{justify-content:center;align-items:flex-start}
+.s-cta h1{font-size:118px;max-width:1500px}
+.s-cta .lead{margin-top:34px}
+.cta-row{display:flex;gap:16px;margin-top:52px;flex-wrap:wrap}
+.contact{margin-top:72px;display:flex;gap:56px;align-items:center;padding:30px 40px;border-radius:24px;border:1px solid var(--line-2);background:rgba(255,255,255,.03)}
+.contact .ph{font:600 26px/1.3 var(--f-body);color:var(--text);border-bottom:2px dashed rgba(198,242,78,.5);padding-bottom:2px}
+.contact .k{font:600 15px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+
+/* ---------- UI chrome ---------- */
+.progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg,var(--lime),var(--cyan));width:0;transition:width .45s cubic-bezier(.2,.7,.2,1);z-index:10}
+.ui{position:fixed;right:20px;top:16px;display:flex;align-items:center;gap:8px;z-index:10;opacity:0;transition:opacity .3s}
+.ui:hover,.ui:focus-within,body.mouse .ui{opacity:1}
+.ui button{width:44px;height:44px;border-radius:12px;background:rgba(20,24,33,.85);border:1px solid var(--line-2);display:grid;place-items:center;color:var(--text)}
+.ui button:hover{background:rgba(40,46,60,.95)}
+.ui button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.ui button svg{width:20px;height:20px}
+.ui .cnt{font:500 14px/1 var(--f-mono);color:var(--text-2);padding:0 8px;min-width:64px;text-align:center}
+.hint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);font:500 13px/1 var(--f-mono);color:var(--muted);z-index:10;opacity:0;transition:opacity .6s;pointer-events:none}
+.hint.show{opacity:1}
+.hint{white-space:nowrap}
+@media (max-width:700px){.hint{display:none}}
+
+
+/* ---------- RU: longer phrases in the comparison table ---------- */
+.vs > div{padding:22px 30px;font-size:22px}
+.vs .hd{padding:24px 30px}
+
+/* ---------- title contacts ---------- */
+.who{margin-top:64px;display:flex;gap:36px;flex-wrap:wrap;align-items:center;font:600 22px/1 var(--f-body);color:var(--text-2)}
+.who span,.who a{display:inline-flex;align-items:center;gap:12px;color:inherit;text-decoration:none}
+.who a:hover{color:var(--text)}
+.who svg{width:24px;height:24px;color:var(--lime)}
+
+/* ---------- developer demo ---------- */
+.devdemo{display:grid;grid-template-columns:1fr 560px;gap:36px;flex:1;min-height:0}
+.devdemo .msgs{padding:24px 30px;gap:16px}
+.devdemo .msg-u{font-size:21px;padding:16px 22px}
+.devdemo .log{font-size:16px;gap:8px}
+.devdemo .msg-a{font-size:19px;padding:20px 24px}
+.diff{margin:12px 0;padding:10px 0;border-radius:14px;background:#0a0e14;border:1px solid var(--line);font:500 15px/1.55 var(--f-mono);color:var(--text-2);overflow:hidden}
+.diff .file{display:block;padding:0 16px 8px;font-size:14px;color:var(--muted)}
+.diff div{display:grid;grid-template-columns:44px 22px 1fr;white-space:pre}
+.diff .ln{color:var(--muted);text-align:right;padding-right:10px}
+.diff .mk{text-align:center}
+.diff .del{background:rgba(255,138,138,.10);color:#ffc2c2}
+.diff .add{background:rgba(198,242,78,.08);color:#e2f7b5}
+.xcard{display:flex;flex-direction:column;gap:18px;padding:32px 32px}
+.xcard .tag{align-self:flex-start}
+.xcard h3{font:600 28px/1.2 var(--f-display)}
+.xq{padding:16px 20px;border-radius:18px 18px 18px 6px;background:linear-gradient(135deg,#2a2258,#1d2a44);font:500 19px/1.45 var(--f-body)}
+.xcard .checks{gap:14px}
+.xcard .checks li{font-size:18px}
+.xcard .checks .mono{font-size:16px;color:var(--violet)}
+.xfile{margin-top:auto;display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:16px;border:1px solid rgba(167,150,255,.3);background:rgba(125,92,255,.08)}
+.xfile b{display:block;font:600 17px/1.3 var(--f-mono);color:var(--text)}
+.xfile span{font:500 16px/1.3 var(--f-body);color:var(--text-2)}
+.xfile .dl{width:26px;height:26px;margin-left:auto;color:var(--violet);flex:none}
+
+/* ---------- print: one slide per page ---------- */
+@page{size:1920px 1080px;margin:0}
+@media print{
+  html,body{overflow:visible;height:auto;background:var(--bg)}
+  .stage{position:static;transform:none!important;width:1920px;height:auto}
+  .slide{position:relative;opacity:1;visibility:visible;width:1920px;height:1080px;page-break-after:always;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .r{opacity:1!important;transform:none!important;transition:none!important}
+  .chart-card .bar-mark{transform:none!important}
+  .progress,.ui,.hint{display:none!important}
+  .hl,.hl-v{background:none!important;-webkit-text-fill-color:currentColor;color:var(--lime)}
+  *{animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="logo" viewBox="0 0 48 48"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c6f24e"/><stop offset="1" stop-color="#5cd8ee"/></linearGradient></defs><rect x="2" y="2" width="44" height="44" rx="13" fill="url(#lg)"/><g fill="none" stroke="#0a0d12" stroke-width="2.6" stroke-linecap="round"><line x1="15" y1="17" x2="24" y2="24"/><line x1="33" y1="17" x2="24" y2="24"/><line x1="24" y1="24" x2="24" y2="34"/></g><g fill="#0a0d12"><circle cx="15" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><circle cx="24" cy="34" r="4"/><circle cx="24" cy="24" r="3"/></g></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+    <symbol id="i-buoy" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></symbol>
+    <symbol id="i-brief" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-graph" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></symbol>
+    <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    <symbol id="i-userplus" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+        <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></symbol>
+    <symbol id="i-git" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="9" r="3"/><path d="M6 9v6"/><path d="M18 12c0 3-3 4-9 4"/></symbol>
+  </defs>
+</svg>
+
+<div class="progress" id="progress"></div>
+
+<div class="stage" id="stage">
+
+<!-- ============ 1. TITLE ============ -->
+<section class="slide s-title g-lime" data-title="Титул">
+  <div class="left">
+    <div class="brand r" style="--d:0"><svg><use href="#logo"/></svg>onec-ai</div>
+    <div class="eyebrow r" style="--d:1">MCP-сервер для команд 1С и BAS</div>
+    <h1 class="r" style="--d:2;font-size:76px">AI, который знает<br><span class="hl">вашу конфигурацию</span></h1>
+    <p class="lead r" style="--d:3">Разработчики, аналитики и поддержка получают точные ответы с&nbsp;цитатами из&nbsp;вашего кода — за секунды, а не за часы поиска.</p>
+    <div class="chips r" style="--d:4">
+      <span class="chip"><svg class="i" style="color:var(--lime)"><use href="#i-code"/></svg>Разработка</span>
+      <span class="chip"><svg class="i" style="color:var(--violet)"><use href="#i-doc"/></svg>Аналитика и ТЗ</span>
+      <span class="chip"><svg class="i" style="color:var(--cyan)"><use href="#i-buoy"/></svg>Поддержка пользователей</span>
+    </div>
+    <div class="who r" style="--d:5">
+      <span><svg class="i"><use href="#i-user"/></svg>Чорнобай Віталій</span>
+      <a href="https://t.me/chornobai1" target="_blank" rel="noopener"><svg class="i"><use href="#i-send"/></svg>t.me/chornobai1</a>
+      <a href="mailto:chornobai1@gmail.com"><svg class="i"><use href="#i-mail"/></svg>chornobai1@gmail.com</a>
+    </div>
+  </div>
+  <div class="right r" style="--d:2">
+    <svg class="orbit" viewBox="0 0 760 760" aria-hidden="true">
+      <defs>
+        <radialGradient id="cg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="rgba(198,242,78,.35)"/><stop offset="1" stop-color="rgba(198,242,78,0)"/></radialGradient>
+      </defs>
+      <circle class="ring" cx="380" cy="380" r="300"/>
+      <circle class="ring b" cx="380" cy="380" r="170"/>
+      <circle cx="380" cy="380" r="200" fill="url(#cg)" class="pulse"/>
+      <line class="edge l" x1="380" y1="380" x2="380" y2="80"/>
+      <line class="edge" x1="380" y1="380" x2="640" y2="230"/>
+      <line class="edge c" x1="380" y1="380" x2="640" y2="530"/>
+      <line class="edge l" x1="380" y1="380" x2="380" y2="680"/>
+      <line class="edge" x1="380" y1="380" x2="120" y2="530"/>
+      <line class="edge c" x1="380" y1="380" x2="120" y2="230"/>
+      <line class="edge" x1="380" y1="80" x2="640" y2="230" style="opacity:.5"/>
+      <line class="edge c" x1="640" y1="530" x2="380" y2="680" style="opacity:.5"/>
+      <line class="edge l" x1="120" y1="230" x2="120" y2="530" style="opacity:.5"/>
+      <circle class="dot" cx="550" cy="380" r="6"/>
+      <circle class="dot" cx="295" cy="527" r="6" style="fill:var(--violet)"/>
+      <circle class="dot" cx="295" cy="233" r="6" style="fill:var(--cyan)"/>
+      <g class="node"><rect x="295" y="56" width="170" height="48" rx="24"/><text x="380" y="80">Документ</text></g>
+      <g class="node"><rect x="555" y="206" width="170" height="48" rx="24"/><text x="640" y="230">Регистр</text></g>
+      <g class="node"><rect x="540" y="506" width="200" height="48" rx="24"/><text x="640" y="530">Заявка SD</text></g>
+      <g class="node"><rect x="295" y="656" width="170" height="48" rx="24"/><text x="380" y="680">Форма</text></g>
+      <g class="node"><rect x="35" y="506" width="170" height="48" rx="24"/><text x="120" y="530">Роль</text></g>
+      <g class="node"><rect x="20" y="206" width="200" height="48" rx="24"/><text x="120" y="230">Общий модуль</text></g>
+      <rect x="320" y="320" width="120" height="120" rx="34" fill="#0b0e14" stroke="rgba(198,242,78,.5)" stroke-width="2"/>
+      <use href="#logo" x="344" y="344" width="72" height="72"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ 2. PROBLEM ============ -->
+<section class="slide s-problem" data-title="Проблема" style="--g1c:rgba(255,138,138,.12)">
+  <div class="head">
+    <div class="eyebrow r" style="--d:0;color:var(--rose)">Проблема</div>
+    <h2 class="r" style="--d:1">Конфигурация выросла.<br>Знания о ней — нет.</h2>
+  </div>
+  <div class="body">
+    <div class="bigstats">
+      <div class="bigstat r" style="--d:2"><div class="v">2,8 млн</div><div class="k">строк кода в конфигурации крупного холдинга</div></div>
+      <div class="bigstat r" style="--d:3"><div class="v">5 600+</div><div class="k">программных модулей</div></div>
+      <div class="bigstat r" style="--d:4"><div class="v">1 800+</div><div class="k">документов и справочников — и лишь несколько человек знают, как всё связано</div></div>
+    </div>
+    <div>
+      <div class="pains">
+        <div class="card pain r" style="--d:3"><div class="t"><div class="ico"><svg class="i"><use href="#i-code"/></svg></div><h3>Разработчик</h3></div><p class="p">«Где формируется это движение? Кто ещё вызывает процедуру? Что сломается, если её изменить?» — часы «археологии» в конфигураторе.</p></div>
+        <div class="card pain r" style="--d:4"><div class="t"><div class="ico v"><svg class="i"><use href="#i-doc"/></svg></div><h3>Аналитик</h3></div><p class="p">Чтобы написать ТЗ, отвлекает разработчика вопросом «а как это сейчас работает?». ТЗ с белыми пятнами возвращается на доработку.</p></div>
+        <div class="card pain r" style="--d:5"><div class="t"><div class="ico c"><svg class="i"><use href="#i-buoy"/></svg></div><h3>Поддержка</h3></div><p class="p">Заявка «не проводится документ» ходит по кругу между линиями, пока кто-то не найдёт причину в коде.</p></div>
+        <div class="card pain r" style="--d:6"><div class="t"><div class="ico m"><svg class="i"><use href="#i-brief"/></svg></div><h3>Бизнес</h3></div><p class="p">Доработки длятся дольше, чем хотелось бы, после релизов появляются регрессии, а ключевые знания — в головах 2–3 человек.</p></div>
+      </div>
+      <div class="banner r" style="--d:7">
+        <div class="v">до 58%</div>
+        <div><div class="t">рабочего времени разработчики тратят на понимание уже написанного кода</div><div class="src" style="margin-top:8px">Xia et al., IEEE Transactions on Software Engineering, 2018</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 3. WHY NOT GENERIC AI ============ -->
+<section class="slide g-left" data-title="Почему не обычный AI">
+  <div class="head">
+    <div class="eyebrow r" style="--d:0">Почему не просто ChatGPT</div>
+    <h2 class="r" style="--d:1">Обычный AI знает 1С.<br><span class="hl">Он не знает вашу 1С.</span></h2>
+  </div>
+  <div class="vs r" style="--d:2">
+    <div class="hd"></div>
+    <div class="hd bad" style="color:var(--text-2)">AI «из коробки»</div>
+    <div class="hd good">AI + onec-ai</div>
+
+    <div class="k">Знания</div>
+    <div class="bad"><svg class="i"><use href="#i-x"/></svg>Общие знания о 1С из интернета</div>
+    <div class="good"><svg class="i"><use href="#i-check"/></svg>Ваш код, метаданные, формы, роли — актуальны каждый день</div>
+
+    <div class="k">Точность</div>
+    <div class="bad"><svg class="i"><use href="#i-x"/></svg>Выдумывает реквизиты и процедуры, которых у вас нет</div>
+    <div class="good"><svg class="i"><use href="#i-check"/></svg>Цитирует файл, процедуру и строку. Нет факта — так и говорит</div>
+
+    <div class="k">Связи</div>
+    <div class="bad"><svg class="i"><use href="#i-x"/></svg>Видит только фрагмент, который вы вставили в чат</div>
+    <div class="good"><svg class="i"><use href="#i-check"/></svg>Граф зависимостей: кто кого вызывает и что затронет изменение</div>
+
+    <div class="k">Заявки</div>
+    <div class="bad"><svg class="i"><use href="#i-x"/></svg>Ничего не знает об обращениях пользователей</div>
+    <div class="good"><svg class="i"><use href="#i-check"/></svg>Читает заявку Service Desk / Jira вместе со скриншотами</div>
+
+    <div class="k">Доступ</div>
+    <div class="bad"><svg class="i"><use href="#i-x"/></svg>Либо весь код в чат, либо ничего</div>
+    <div class="good"><svg class="i"><use href="#i-check"/></svg>Роли: разработчик видит код, аналитик — логику, пользователь — метаданные</div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 4. SOLUTION ============ -->
+<section class="slide g-cyan" data-title="Решение">
+  <div class="head">
+    <div class="eyebrow c r" style="--d:0">Решение</div>
+    <h2 class="r" style="--d:1">onec-ai — слой знаний между вашей&nbsp;1С<br>и <span style="white-space:nowrap">AI-ассистентом</span> команды</h2>
+  </div>
+  <div class="flow">
+    <div class="card fbox r" style="--d:2">
+      <div class="ico m"><svg class="i"><use href="#i-db"/></svg></div>
+      <h3>Ваша 1С</h3>
+      <ul><li>Конфигурация: код и метаданные</li><li>Код в справочниках (алгоритмы)</li><li>Заявки Service Desk / Jira</li></ul>
+    </div>
+    <div class="arrow r" style="--d:3"><svg class="i"><use href="#i-arrow"/></svg></div>
+    <div class="card fbox core glow-l r" style="--d:3">
+      <div class="ico"><svg class="i"><use href="#i-layers"/></svg></div>
+      <h3>onec-ai</h3>
+      <ul><li>Поисковый индекс кода и метаданных</li><li>Граф зависимостей</li><li>Навыки и стандарты 1С</li><li>Коннекторы к заявкам</li></ul>
+      <div class="mcp">32 ИНСТРУМЕНТА · MCP</div>
+    </div>
+    <div class="arrow r" style="--d:4"><svg class="i"><use href="#i-arrow"/></svg></div>
+    <div class="card fbox r" style="--d:4">
+      <div class="ico v"><svg class="i"><use href="#i-msg"/></svg></div>
+      <h3>AI-клиент</h3>
+      <ul><li>Claude (Desktop, Code)</li><li>Cursor</li><li>Codex</li></ul>
+    </div>
+    <div class="arrow r" style="--d:5"><svg class="i"><use href="#i-arrow"/></svg></div>
+    <div class="card fbox r" style="--d:5">
+      <div class="ico c"><svg class="i"><use href="#i-users"/></svg></div>
+      <h3>Команда</h3>
+      <ul><li>Разработчики</li><li>Аналитики</li><li>Поддержка и ключевые пользователи</li></ul>
+    </div>
+  </div>
+  <div class="pillars">
+    <div class="card pillar r" style="--d:6"><div class="ico"><svg class="i"><use href="#i-target"/></svg></div><div><h3>Вы выбираете AI — мы даём ему знания</h3><p class="p">Команда работает в привычном AI-клиенте. onec-ai добавляет ему контекст именно вашей конфигурации.</p></div></div>
+    <div class="card pillar r" style="--d:7"><div class="ico v"><svg class="i"><use href="#i-graph"/></svg></div><div><h3>Открытый стандарт MCP</h3><p class="p">Model Context Protocol — открытый протокол подключения инструментов к AI. Без привязки к одному вендору.</p></div></div>
+    <div class="card pillar r" style="--d:8"><div class="ico c"><svg class="i"><use href="#i-download"/></svg></div><div><h3>Подключение одним установщиком</h3><p class="p">Для каждого сотрудника: без прав администратора и ручного редактирования конфигов.</p></div></div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 5. HOW IT WORKS ============ -->
+<section class="slide g-left" data-title="Как это работает" style="--g1c:rgba(198,242,78,.10)">
+  <div class="head">
+    <div class="eyebrow r" style="--d:0">Как это работает</div>
+    <h2 class="r" style="--d:1">От коммита в конфигурации до ответа&nbsp;AI</h2>
+  </div>
+  <div class="steps">
+    <div class="card step r" style="--d:2"><div class="n">01 · ВЫГРУЗКА</div><div class="ico m"><svg class="i"><use href="#i-git"/></svg></div><h3>Снимок конфигурации</h3><p class="p">Агент на Windows по расписанию выгружает конфигурацию в Git. Рабочая база при этом не меняется.</p></div>
+    <div class="card step r" style="--d:3"><div class="n">02 · ИНДЕКСАЦИЯ</div><div class="ico"><svg class="i"><use href="#i-db"/></svg></div><h3>Только изменённое</h3><p class="p">Инкрементально, по контрольным суммам файлов. Код режется по процедурам, метаданные — по реквизитам, с именами и синонимами.</p></div>
+    <div class="card step r" style="--d:4"><div class="n">03 · ГРАФ</div><div class="ico v"><svg class="i"><use href="#i-graph"/></svg></div><h3>Все связи</h3><p class="p">Вызовы процедур, движения регистров, роли, формы, типы — и даже код, который хранится в данных справочников.</p></div>
+    <div class="card step r" style="--d:5"><div class="n">04 · ОТВЕТ</div><div class="ico c"><svg class="i"><use href="#i-search"/></svg></div><h3>Гибридный поиск</h3><p class="p">Смысловой + точный + графовый поиск сливаются в один рейтинг → ответ со ссылками на источник.</p></div>
+  </div>
+  <div class="metrics">
+    <div class="metric r" style="--d:6"><div class="v">~10 мин</div><div class="k">от коммита до обновлённого индекса</div></div>
+    <div class="metric r" style="--d:7"><div class="v">~0,3 с</div><div class="k">точный поиск по 2,8 млн строк кода</div></div>
+    <div class="metric r" style="--d:8"><div class="v">32</div><div class="k">инструмента MCP: поиск, граф, формы, роли, заявки, сборка</div></div>
+    <div class="metric r" style="--d:9"><div class="v">84</div><div class="k">навыка для 1С: формы, роли, СКД, БСП, запросы</div></div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 6. DEVELOPERS ============ -->
+<section class="slide" data-title="Разработчикам" style="--g1c:rgba(198,242,78,.12)">
+  <div class="role">
+    <div class="left">
+      <div class="eyebrow r" style="--d:0">Для разработчиков</div>
+      <h2 class="r" style="--d:1">Меньше археологии —<br>больше разработки</h2>
+      <ul class="checks r" style="--d:2;margin-top:44px">
+        <li><svg class="i"><use href="#i-check"/></svg>Поиск по коду и метаданным с цитатами: файл, процедура, строка</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Анализ влияния изменений — до 5 уровней зависимостей</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Отчёт о рисках по каждому релизу — автоматически после коммита</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Сборка внешних обработок и отчётов, проверка XML на агенте с вашей платформой</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Стандарты кода команды — как «навыки» для AI</li>
+      </ul>
+      <div class="effect r" style="--d:3">Результат: разработчик тратит время на <b>решение</b>, а не на поиск места, где его применить.</div>
+    </div>
+    <div class="prompts">
+      <div class="prompt r" style="--d:3"><div class="q"><span class="av" style="background:var(--lime-dim);color:var(--lime)">DEV</span>Кто вызывает «ЗаполнитьПоОснованию» и что сломается, если изменить её параметры?</div><div class="tools"><span class="tool l">find_callers</span><span class="tool l">impact_analysis</span></div></div>
+      <div class="prompt r" style="--d:4"><div class="q"><span class="av" style="background:var(--lime-dim);color:var(--lime)">DEV</span>Какая процедура срабатывает на кнопку «Заполнить» в форме заказа?</div><div class="tools"><span class="tool l">form_events</span><span class="tool l">trace_form_handler</span></div></div>
+      <div class="prompt r" style="--d:5"><div class="q"><span class="av" style="background:var(--lime-dim);color:var(--lime)">DEV</span>Где формируются движения по регистру взаиморасчётов?</div><div class="tools"><span class="tool l">search_code</span><span class="tool l">graph_context</span></div></div>
+      <div class="prompt r" style="--d:6"><div class="q"><span class="av" style="background:var(--lime-dim);color:var(--lime)">DEV</span>Собери внешнюю обработку из этих исходников и проверь XML</div><div class="tools"><span class="tool l">worker: build_epf</span><span class="tool l">validate_xml</span></div></div>
+    </div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ DEV DEMO ============ -->
+<section class="slide g-left" data-title="Пример для разработчика" style="--g1c:rgba(198,242,78,.12)">
+  <div class="head" style="margin-bottom:32px">
+    <div class="eyebrow r" style="--d:0">Как это выглядит для разработчика</div>
+    <h2 class="r" style="--d:1">От задачи — к готовому коду</h2>
+  </div>
+  <div class="devdemo">
+    <div class="chat r" style="--d:2">
+      <div class="bar"><i></i><i></i><i></i><span>AI-ассистент · подключён onec-ai</span></div>
+      <div class="msgs">
+        <div class="msg-u r" style="--d:3">Запрети проводить реализацию, если клиент в стоп-листе. Что и где изменить?</div>
+        <div class="log">
+          <div class="r" style="--d:5"><svg class="i"><use href="#i-check"/></svg>search_code «стоп-лист клиента» <em>— СтопЛистСервер.КлиентЗаблокирован()</em></div>
+          <div class="r" style="--d:6"><svg class="i"><use href="#i-check"/></svg>find_callers ОбработкаПроведения <em>— 3 вызова</em></div>
+          <div class="r" style="--d:7"><svg class="i"><use href="#i-check"/></svg>impact_analysis РеализацияТоваровУслуг <em>— 2 отчёта и обмен только читают документ</em></div>
+        </div>
+        <div class="msg-a r" style="--d:9">
+          <p><b>Где:</b> <code>РеализацияТоваровУслуг</code> → модуль объекта, <code>ОбработкаПроведения()</code>, строка 42. Замените проверку флага на общую функцию стоп-листа:</p>
+          <div class="diff">
+            <span class="file">Documents/РеализацияТоваровУслуг/Ext/ObjectModule.bsl</span>
+            <div><span class="ln">41</span><span class="mk"> </span><span>Процедура ОбработкаПроведения(Отказ, РежимПроведения)</span></div>
+            <div class="del"><span class="ln">42</span><span class="mk">−</span><span>    Если Контрагент.Заблокирован Тогда</span></div>
+            <div class="add"><span class="ln">42</span><span class="mk">+</span><span>    Если СтопЛистСервер.КлиентЗаблокирован(Контрагент, Дата) Тогда</span></div>
+            <div class="add"><span class="ln">43</span><span class="mk">+</span><span>        ОбщегоНазначения.СообщитьПользователю(</span></div>
+            <div class="add"><span class="ln">44</span><span class="mk">+</span><span>            НСтр("ru = 'Клиент в стоп-листе'"),, "Контрагент");</span></div>
+            <div><span class="ln">45</span><span class="mk"> </span><span>        Отказ = Истина;</span></div>
+            <div><span class="ln">46</span><span class="mk"> </span><span>    КонецЕсли;</span></div>
+          </div>
+          <p><b>Влияние:</b> отчёты и обмен документ только читают — изменение их не сломает. Патч сохранён как черновик, в Конфигуратор его переносите вы.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card xcard glow-v r" style="--d:6">
+      <span class="tag">Или — новая обработка</span>
+      <h3>Внешняя обработка за минуты</h3>
+      <div class="xq">Создай внешнюю обработку: загрузка цен поставщика из Excel</div>
+      <ul class="checks v">
+        <li><svg class="i"><use href="#i-check"/></svg><span>Сгенерированы форма, модуль и макет</span></li>
+        <li><svg class="i"><use href="#i-check"/></svg><span><span class="mono">worker_upload_staging</span> — исходники на агенте</span></li>
+        <li><svg class="i"><use href="#i-check"/></svg><span><span class="mono">build_epf</span> — сборка на вашей платформе 1С</span></li>
+        <li><svg class="i"><use href="#i-check"/></svg><span>XML проверен, ошибок нет</span></li>
+      </ul>
+      <div class="xfile"><div class="ico v"><svg class="i"><use href="#i-file"/></svg></div><div><b>ЗагрузкаЦенПоставщика.epf</b><span>готово · ссылка на скачивание</span></div><svg class="i dl"><use href="#i-download"/></svg></div>
+      <p class="small">Иллюстративный пример. Названия объектов условные.</p>
+    </div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 7. ANALYSTS ============ -->
+<section class="slide" data-title="Аналитикам" style="--g1c:rgba(125,92,255,.22)">
+  <div class="role">
+    <div class="left">
+      <div class="eyebrow v r" style="--d:0">Для аналитиков</div>
+      <h2 class="r" style="--d:1">ТЗ на фактах,<br>а не на предположениях</h2>
+      <ul class="checks v r" style="--d:2;margin-top:44px">
+        <li><svg class="i"><use href="#i-check"/></svg>Структура объектов с синонимами — так, как видит пользователь</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Текущая логика человеческим языком — без полного доступа к исходному коду</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Черновики ТЗ и спецификаций в отдельной зоне артефактов</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Перечень затронутых объектов — более точная оценка трудоёмкости</li>
+      </ul>
+      <div class="effect r" style="--d:3">Результат: <b style="color:var(--violet)">меньше отвлечений</b> разработчиков, меньше белых пятен в ТЗ и возвратов на доработку.</div>
+    </div>
+    <div class="prompts">
+      <div class="prompt r" style="--d:3"><div class="q"><span class="av" style="background:var(--violet-dim);color:var(--violet)">BA</span>Какие реквизиты и табличные части у «Заказа клиента»? Названия — как в интерфейсе.</div><div class="tools"><span class="tool v">object_structure</span></div></div>
+      <div class="prompt r" style="--d:4"><div class="q"><span class="av" style="background:var(--violet-dim);color:var(--violet)">BA</span>Объясни по шагам, как сейчас рассчитывается скидка в заказе.</div><div class="tools"><span class="tool v">ask</span><span class="tool v">search_code</span></div></div>
+      <div class="prompt r" style="--d:5"><div class="q"><span class="av" style="background:var(--violet-dim);color:var(--violet)">BA</span>Какие объекты затронет новое поле «Сезон» в номенклатуре?</div><div class="tools"><span class="tool v">find_usages</span><span class="tool v">impact_analysis</span></div></div>
+      <div class="prompt r" style="--d:6"><div class="q"><span class="av" style="background:var(--violet-dim);color:var(--violet)">BA</span>Составь черновик ТЗ на доработку по заявке ERP-1024.</div><div class="tools"><span class="tool v">get_servicedesk_task_context</span><span class="tool v">artifact_create_draft</span></div></div>
+    </div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 8. SUPPORT ============ -->
+<section class="slide g-cyan" data-title="Поддержке">
+  <div class="head">
+    <div class="eyebrow c r" style="--d:0">Для пользователей и поддержки</div>
+    <h2 class="r" style="--d:1">От заявки до причины — за минуты</h2>
+    <p class="lead r" style="--d:2">Пользователи обращаются как и раньше — через Service Desk или Jira. Меняется то, что происходит дальше.</p>
+  </div>
+  <div class="timeline">
+    <div class="tl r" style="--d:3"><div class="ball"><svg class="i"><use href="#i-inbox"/></svg><b>1</b></div><h3>Заявка</h3><p class="p">Пользователь описывает проблему и прикладывает скриншот ошибки — как обычно</p></div>
+    <div class="tl r" style="--d:4"><div class="ball"><svg class="i"><use href="#i-hash"/></svg><b>2</b></div><h3>Номер</h3><p class="p">Специалист передаёт AI номер или ссылку на заявку</p></div>
+    <div class="tl r" style="--d:5"><div class="ball"><svg class="i"><use href="#i-msg"/></svg><b>3</b></div><h3>Контекст</h3><p class="p">AI читает описание, комментарии, согласования и вложения</p></div>
+    <div class="tl r" style="--d:6"><div class="ball"><svg class="i"><use href="#i-search"/></svg><b>4</b></div><h3>Причина</h3><p class="p">Находит в коде место и условие, которое вызывает ошибку</p></div>
+    <div class="tl r" style="--d:7"><div class="ball"><svg class="i"><use href="#i-check"/></svg><b>5</b></div><h3>Решение</h3><p class="p">Что сделать пользователю сейчас — и что исправить разработчику</p></div>
+  </div>
+  <div class="ba">
+    <div class="card before r" style="--d:8"><div class="lbl">Обычно</div><p class="p">Заявка переходит между линиями поддержки, разработчик отвлекается на диагностику, пользователь ждёт ответа днями.</p></div>
+    <div class="card after glow-c r" style="--d:9"><div class="lbl">С onec-ai</div><p class="p">Первая линия сама находит причину типовых ошибок, разработчик получает готовый диагноз с местом в коде.</p></div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 9. DEMO ============ -->
+<section class="slide g-left" data-title="Пример диалога" style="--g1c:rgba(125,92,255,.18)">
+  <div class="head" style="margin-bottom:36px">
+    <div class="eyebrow v r" style="--d:0">Как это выглядит</div>
+    <h2 class="r" style="--d:1">Один вопрос — диагноз с местом в коде</h2>
+  </div>
+  <div class="demo">
+    <div class="chat r" style="--d:2">
+      <div class="bar"><i></i><i></i><i></i><span>AI-ассистент · подключён onec-ai</span></div>
+      <div class="msgs">
+        <div class="msg-u r" style="--d:3">Заявка SD-10482: «Не проводится реализация — <i>Недостаточно товара на складе</i>, хотя в остатках товар есть». Найди причину.</div>
+        <div class="log">
+          <div class="r" style="--d:5"><svg class="i"><use href="#i-check"/></svg>get_servicedesk_task_context <em>— заявка, 3 комментария, 1 скриншот</em></div>
+          <div class="r" style="--d:6"><svg class="i"><use href="#i-check"/></svg>grep_code «Недостаточно товара» <em>— 4 совпадения</em></div>
+          <div class="r" style="--d:7"><svg class="i"><use href="#i-check"/></svg>find_callers ПроверитьОстатки <em>— 3 вызова</em></div>
+          <div class="r" style="--d:8"><svg class="i"><use href="#i-check"/></svg>read_source ЗапасыСервер <em>— строки 180–240</em></div>
+        </div>
+        <div class="msg-a r" style="--d:10">
+          <p><b>Причина.</b> При проведении остаток контролируется в разрезе <b>склада и серии</b>. В строках 3 и 5 серия не заполнена, поэтому остаток «без серии» нулевой, хотя общий остаток товара есть.</p>
+          <p><b>Где:</b> <code>ЗапасыСервер.ПроверитьОстатки()</code>, строка 214 — условие отбора по серии.</p>
+          <p><b>Пользователю:</b> заполнить серию в строках 3 и 5 и провести документ повторно.<br><b>Разработчику:</b> предложение по исправлению сохранено как черновик в зоне артефактов.</p>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="card note r" style="--d:6"><div class="ico"><svg class="i"><use href="#i-target"/></svg></div><div><h3>Конкретно, а не в общем</h3><p class="p">Ответ привязан к вашему коду: модуль, процедура, строка.</p></div></div>
+      <div class="card note r" style="--d:7"><div class="ico v"><svg class="i"><use href="#i-users"/></svg></div><div><h3>Два адресата</h3><p class="p">Что делать пользователю сейчас — и что исправить в конфигурации.</p></div></div>
+      <div class="card note r" style="--d:8"><div class="ico c"><svg class="i"><use href="#i-shield"/></svg></div><div><h3>Ничего не изменено</h3><p class="p">Исправление — только черновик. Решение принимает человек.</p></div></div>
+      <p class="small r" style="--d:9">Иллюстративный пример. Названия объектов условные.</p>
+    </div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 10. SCALE ============ -->
+<section class="slide g-lime" data-title="Масштаб">
+  <div class="head">
+    <div class="eyebrow r" style="--d:0">Кейс · крупный агрохолдинг</div>
+    <h2 class="r" style="--d:1">Проверено на конфигурации <span class="hl">масштаба enterprise</span></h2>
+  </div>
+  <div class="scale">
+    <div class="card scol r" style="--d:2">
+      <div class="hdr"><div class="ico m"><svg class="i"><use href="#i-db"/></svg></div><h3>Конфигурация</h3></div>
+      <div class="srow"><span class="v">2,83 млн</span><span class="k">строк кода</span></div>
+      <div class="srow"><span class="v">5 645</span><span class="k">модулей</span></div>
+      <div class="srow"><span class="v">1 167</span><span class="k">документов</span></div>
+      <div class="srow"><span class="v">647</span><span class="k">справочников</span></div>
+    </div>
+    <div class="card scol glow-l r" style="--d:3">
+      <div class="hdr"><div class="ico"><svg class="i"><use href="#i-graph"/></svg></div><h3>Что видит AI</h3></div>
+      <div class="srow"><span class="v">210 тыс.</span><span class="k">фрагментов в поисковом индексе</span></div>
+      <div class="srow"><span class="v">1,97 млн</span><span class="k">связей в графе зависимостей</span></div>
+      <div class="srow"><span class="v">43,9 тыс.</span><span class="k">элементов метаданных</span></div>
+      <div class="srow"><span class="v">6 200+</span><span class="k">обычных форм — AI читает и их</span></div>
+    </div>
+    <div class="card scol r" style="--d:4">
+      <div class="hdr"><div class="ico c"><svg class="i"><use href="#i-activity"/></svg></div><h3>Как работает</h3></div>
+      <div class="srow"><span class="v">94%</span><span class="k">контрольных вопросов — ежедневный автотест качества</span></div>
+      <div class="srow"><span class="v">1,5–6 мин</span><span class="k">ежедневное обновление индекса</span></div>
+      <div class="srow"><span class="v">0,3–3 с</span><span class="k">типичный ответ инструмента</span></div>
+      <div class="srow"><span class="v">1 сервер</span><span class="k">8 vCPU — для всей команды</span></div>
+    </div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 11. ADOPTION ============ -->
+<section class="slide g-left" data-title="Использование" style="--g1c:rgba(125,92,255,.18)">
+  <div class="head" style="margin-bottom:40px">
+    <div class="eyebrow v r" style="--d:0">Кейс · использование</div>
+    <h2 class="r" style="--d:1">От пилота до ежедневного инструмента за&nbsp;4&nbsp;месяца</h2>
+  </div>
+  <div class="adopt">
+    <div class="kpis">
+      <div class="card kpi r" style="--d:2"><div class="v">41 тыс.</div><div class="k">вызовов инструментов AI-ассистентами с июня</div></div>
+      <div class="card kpi r" style="--d:3"><div class="v">30</div><div class="k">специалистов уже работают с сервером</div></div>
+      <div class="card kpi r" style="--d:4"><div class="v">287</div><div class="k">обращений AI к заявкам Service Desk / Jira</div></div>
+      <div class="card kpi r" style="--d:5"><div class="v">134</div><div class="k">подготовленных артефакта: отчёты проверок, предложения исправлений, ТЗ</div></div>
+    </div>
+    <div class="charts">
+      <div class="chart-card r" style="--d:4"><h3>Активные пользователи в месяц</h3><div class="sub">Количество специалистов, обращавшихся к серверу</div><div class="plot"><svg id="ch-users" role="img" aria-label="Активные пользователи: июнь 11, июль 14, август 18, сентябрь 17, октябрь 25"></svg></div><div class="tip"></div></div>
+      <div class="chart-card r" style="--d:5"><h3>Вызовы инструментов в месяц</h3><div class="sub">Июнь — с 12.06 (запуск), октябрь — 1–21.10</div><div class="plot"><svg id="ch-calls" role="img" aria-label="Вызовы: июнь 3375, июль 7632, август 11667, сентябрь 9947, октябрь 8616"></svg></div><div class="tip"></div></div>
+    </div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 12. CALCULATOR ============ -->
+<section class="slide g-lime" data-title="Калькулятор экономии">
+  <div class="head" style="margin-bottom:34px">
+    <div class="eyebrow r" style="--d:0">Экономика</div>
+    <h2 class="r" style="--d:1">Посчитайте эффект для своей команды</h2>
+  </div>
+  <div class="calc">
+    <div class="card calc-in r" style="--d:2">
+      <div class="field"><div class="top"><label for="in-dev">Разработчиков 1С</label><output id="o-dev">10</output></div><input type="range" id="in-dev" min="1" max="60" step="1" value="10"></div>
+      <div class="field"><div class="top"><label for="in-an">Аналитиков и консультантов</label><output id="o-an">4</output></div><input type="range" id="in-an" min="0" max="30" step="1" value="4"></div>
+      <div class="field"><div class="top"><label for="in-sup">Заявок на 2-ю/3-ю линию в месяц</label><output id="o-sup">200</output></div><input type="range" id="in-sup" min="0" max="2000" step="10" value="200"></div>
+      <div class="field"><div class="top"><label for="in-rate">Стоимость часа специалиста, ₴</label><output id="o-rate">600</output></div><input type="range" id="in-rate" min="200" max="2000" step="50" value="600"></div>
+      <div class="field"><div class="top"><label>Сценарий</label></div>
+        <div class="seg" role="radiogroup" aria-label="Сценарий оценки">
+          <button type="button" role="radio" data-sc="cons" aria-checked="false">Осторожный</button>
+          <button type="button" role="radio" data-sc="base" aria-checked="true" class="on">Базовый</button>
+          <button type="button" role="radio" data-sc="opt" aria-checked="false">Оптимистичный</button>
+        </div>
+      </div>
+    </div>
+    <div class="calc-out">
+      <div class="card hero-out r" style="--d:3">
+        <div class="lbl">Потенциальная экономия в год · оценка</div>
+        <div class="big"><span id="r-year">2,66 млн</span><small>₴</small></div>
+        <div class="sub">≈ <b id="r-fte">2,3</b> штатной единицы, высвобожденной под развитие, а не под рутину</div>
+      </div>
+      <div class="tiles r" style="--d:4">
+        <div class="card tile"><div class="k">Часов в месяц</div><div class="v" id="r-hours">369</div></div>
+        <div class="card tile"><div class="k">Гривен в месяц</div><div class="v" id="r-month">221 тыс.</div></div>
+        <div class="card tile"><div class="k">Часов в год</div><div class="v" id="r-hyear">4 426</div></div>
+      </div>
+      <div class="card brk r" style="--d:5">
+        <div class="k">Откуда экономия, часов в месяц</div>
+        <div class="stack" role="img" aria-label="Распределение экономии по ролям" id="stack"><div style="background:var(--c-dev)" id="b-dev"></div><div style="background:var(--c-an)" id="b-an"></div><div style="background:var(--c-sup)" id="b-sup"></div></div>
+        <div class="legend"><span><i style="background:var(--c-dev)"></i>Разработка <b id="l-dev">192</b></span><span><i style="background:var(--c-an)"></i>Аналитика <b id="l-an">77</b></span><span><i style="background:var(--c-sup)"></i>Поддержка <b id="l-sup">100</b></span></div>
+      </div>
+    </div>
+  </div>
+  <p class="assume r" style="--d:6" id="assume"></p>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 13. BUSINESS ============ -->
+<section class="slide g-cyan" data-title="Эффект для бизнеса">
+  <div class="head">
+    <div class="eyebrow c r" style="--d:0">Эффект для бизнеса</div>
+    <h2 class="r" style="--d:1">Больше, чем сэкономленные часы</h2>
+  </div>
+  <div class="grid3">
+    <div class="card gcard r" style="--d:2"><div class="ico"><svg class="i"><use href="#i-zap"/></svg></div><h3>Быстрее к результату</h3><p class="p">Меньше времени на разбор существующего кода — доработки попадают к пользователям раньше.</p></div>
+    <div class="card gcard r" style="--d:3"><div class="ico v"><svg class="i"><use href="#i-alert"/></svg></div><h3>Меньше регрессий</h3><p class="p">Анализ влияния перед изменением и автоматический отчёт о рисках после каждого релиза.</p></div>
+    <div class="card gcard r" style="--d:4"><div class="ico c"><svg class="i"><use href="#i-book"/></svg></div><h3>Знания не увольняются</h3><p class="p">Логику конфигурации объясняет система, а не 2–3 незаменимых человека. Ниже риск для бизнеса.</p></div>
+    <div class="card gcard r" style="--d:5"><div class="ico c"><svg class="i"><use href="#i-userplus"/></svg></div><h3>Быстрый онбординг</h3><p class="p">Новичок задаёт вопросы AI, а не отвлекает старших коллег. Погружение в конфигурацию — заметно быстрее.</p></div>
+    <div class="card gcard r" style="--d:6"><div class="ico"><svg class="i"><use href="#i-buoy"/></svg></div><h3>Разгрузка поддержки</h3><p class="p">Часть заявок первая линия закрывает сама, без эскалации на разработчиков.</p></div>
+    <div class="card gcard r" style="--d:7"><div class="ico v"><svg class="i"><use href="#i-bars"/></svg></div><h3>Прозрачность</h3><p class="p">Аудит запросов показывает, какие процессы и модули вызывают больше всего вопросов — где стоит улучшать.</p></div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 14. SECURITY ============ -->
+<section class="slide g-left" data-title="Безопасность" style="--g1c:rgba(28,159,208,.16)">
+  <div class="head">
+    <div class="eyebrow c r" style="--d:0">Безопасность и контроль</div>
+    <h2 class="r" style="--d:1">AI видит ровно то, что разрешено</h2>
+  </div>
+  <div class="grid3">
+    <div class="card gcard r" style="--d:2"><div class="ico"><svg class="i"><use href="#i-lock"/></svg></div><h3>Только чтение</h3><p class="p">Сервер не меняет ни конфигурацию, ни базу. Предложения изменений — только черновики в отдельной зоне.</p></div>
+    <div class="card gcard r" style="--d:3"><div class="ico v"><svg class="i"><use href="#i-eye"/></svg></div><h3>Роли доступа</h3><p class="p">Разработчик, аналитик, пользователь. Полный исходный код видит только роль «разработчик».</p></div>
+    <div class="card gcard r" style="--d:4"><div class="ico c"><svg class="i"><use href="#i-key"/></svg></div><h3>Персональные ключи</h3><p class="p">У каждого сотрудника свой ключ. Отзыв — в один клик, без влияния на других.</p></div>
+    <div class="card gcard r" style="--d:5"><div class="ico c"><svg class="i"><use href="#i-activity"/></svg></div><h3>Полный аудит</h3><p class="p">Каждый вызов фиксируется: кто, какой инструмент, когда и сколько длился.</p></div>
+    <div class="card gcard r" style="--d:6"><div class="ico"><svg class="i"><use href="#i-shield"/></svg></div><h3>Секреты под маской</h3><p class="p">Пароли и токены в алгоритмах из справочников маскируются ещё до индексации.</p></div>
+    <div class="card gcard r" style="--d:7"><div class="ico v"><svg class="i"><use href="#i-server"/></svg></div><h3>Ваш контур — ваши правила</h3><p class="p">Возможно развёртывание на вашем сервере. AI-клиент и подписку выбираете вы — мы не перепродаём модели.</p></div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 15. DEPLOYMENT ============ -->
+<section class="slide g-center" data-title="Развёртывание">
+  <div class="head">
+    <div class="eyebrow r" style="--d:0">Варианты развёртывания</div>
+    <h2 class="r" style="--d:1">Три способа развёртывания</h2>
+  </div>
+  <div class="deploy">
+    <div class="card dcard r" style="--d:2"><div class="ico c"><svg class="i"><use href="#i-cloud"/></svg></div><span class="tag">SaaS</span><h3>Облако</h3><p class="p">Отдельная изолированная среда для каждого клиента: свой сервис и своя база. Обновления и мониторинг — на нас.</p><div class="who"><b>Для кого</b>Средний бизнес, которому нужен быстрый старт без собственной инфраструктуры</div></div>
+    <div class="card dcard glow-l r" style="--d:3"><div class="ico"><svg class="i"><use href="#i-server"/></svg></div><span class="tag">Managed on-prem</span><h3>У вас, под нашим сопровождением</h3><p class="p">Наш стек на вашем сервере. Код не покидает ваш периметр, а обновления и поддержку мы берём на себя.</p><div class="who"><b>Для кого</b>Компании, которые не передают код наружу, но не хотят содержать DevOps под продукт</div></div>
+    <div class="card dcard r" style="--d:4"><div class="ico v"><svg class="i"><use href="#i-box"/></svg></div><span class="tag">Box</span><h3>Полностью в вашем контуре</h3><p class="p">Разворачиваете и обслуживаете сами, обновления — офлайн-пакетами. Опционально — локальные модели без выхода в интернет*.</p><div class="who"><b>Для кого</b>Крупные компании с закрытыми сетями и строгими требованиями ИБ</div></div>
+  </div>
+  <div class="req r" style="--d:5">
+    <span class="lbl">Что нужно от вас</span>
+    <span class="chip">Windows-хост с платформой 1С</span>
+    <span class="chip">Выгрузка в формате Конфигуратора</span>
+    <span class="chip">Claude, Cursor или Codex</span>
+  </div>
+  <p class="small r" style="--d:6;margin-top:14px">* Локальные модели эмбеддингов — в дорожной карте продукта.</p>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ 16. PILOT ============ -->
+<section class="slide g-lime" data-title="Пилот">
+  <div class="head">
+    <div class="eyebrow r" style="--d:0">Как стартуем</div>
+    <h2 class="r" style="--d:1">Пилот: эффект на ваших данных<br>за <span class="hl">6–8 недель</span></h2>
+  </div>
+  <div class="plan">
+    <div class="card phase r" style="--d:2"><div class="w">Неделя 0</div><h3>Демо и цели</h3><p class="p">Показываем систему, подписываем NDA, договариваемся о целях и метриках пилота.</p><div class="bar"><i style="width:12%"></i></div></div>
+    <div class="card phase r" style="--d:3"><div class="w">Неделя 1</div><h3>Подключение</h3><p class="p">Агент, первая выгрузка, полная индексация, проверка качества на ваших реальных вопросах.</p><div class="bar"><i style="width:30%"></i></div></div>
+    <div class="card phase r" style="--d:4"><div class="w">Неделя 2</div><h3>Команда</h3><p class="p">Ключи и установщик для каждого сотрудника, обучение разработчиков, аналитиков и поддержки.</p><div class="bar"><i style="width:50%"></i></div></div>
+    <div class="card phase glow-l r" style="--d:5"><div class="w">Недели 3–8</div><h3>Работа и замеры</h3><p class="p">Еженедельная обратная связь, статистика использования, фиксация примеров «было / стало».</p><div class="bar"><i style="width:100%"></i></div></div>
+  </div>
+  <div class="outcome r" style="--d:6"><div class="ico"><svg class="i"><use href="#i-trend"/></svg></div><p class="p">Результат пилота — отчёт с измеренной экономией часов, вашими примерами и решением о масштабировании на всю команду.</p></div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+</div>
+
+<div class="ui" id="ui">
+  <button type="button" id="prev" aria-label="Предыдущий слайд"><svg class="i"><use href="#i-left"/></svg></button>
+  <span class="cnt" id="cnt">1 / 17</span>
+  <button type="button" id="next" aria-label="Следующий слайд"><svg class="i"><use href="#i-right"/></svg></button>
+  <button type="button" id="fs" aria-label="На весь экран"><svg class="i"><use href="#i-full"/></svg></button>
+</div>
+<div class="hint" id="hint">← → навигация · F — на весь экран · Ctrl+P — PDF</div>
+
+<script>
+(function(){
+  const stage = document.getElementById('stage');
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const N = slides.length;
+  const pad = n => String(n).padStart(2,'0');
+  slides.forEach((s,i)=>{ const pg = s.querySelector('.pg'); if(pg) pg.textContent = pad(i+1)+' / '+pad(N); });
+
+  function fit(){
+    const s = Math.min(window.innerWidth/1920, window.innerHeight/1080);
+    stage.style.transform = 'translate(-50%,-50%) scale('+s+')';
+  }
+  window.addEventListener('resize', fit); fit();
+
+  let cur = -1;
+  function go(n){
+    n = Math.max(0, Math.min(N-1, n));
+    if(n === cur) return;
+    if(cur >= 0) slides[cur].classList.remove('active');
+    slides[n].classList.add('active');
+    cur = n;
+    document.getElementById('cnt').textContent = (n+1)+' / '+N;
+    document.getElementById('progress').style.width = ((n+1)/N*100)+'%';
+    try{ history.replaceState(null,'','#'+(n+1)); }catch(e){}
+  }
+  const start = parseInt((location.hash||'').slice(1),10);
+  go(isNaN(start) ? 0 : start-1);
+
+  const isField = el => el && el.closest && el.closest('input,textarea,select,[contenteditable="true"]');
+  document.addEventListener('keydown', e=>{
+    if(e.altKey||e.ctrlKey||e.metaKey) return;
+    const k = e.key;
+    if(isField(e.target) && ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','Home','End','PageUp','PageDown'].includes(k)) return;
+    if(['ArrowRight','PageDown',' '].includes(k) || (k==='ArrowDown')){ e.preventDefault(); go(cur+1); }
+    else if(['ArrowLeft','PageUp'].includes(k) || k==='ArrowUp'){ e.preventDefault(); go(cur-1); }
+    else if(k==='Home'){ go(0); } else if(k==='End'){ go(N-1); }
+    else if(k==='f'||k==='F'||k==='а'||k==='А'){ toggleFs(); }
+  });
+  document.getElementById('prev').onclick = ()=>go(cur-1);
+  document.getElementById('next').onclick = ()=>go(cur+1);
+  function toggleFs(){
+    try{ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }catch(e){}
+  }
+  document.getElementById('fs').onclick = toggleFs;
+
+  let tx = null;
+  document.addEventListener('touchstart', e=>{ if(!isField(e.target)) tx = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', e=>{
+    if(tx===null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
+    if(Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1));
+  });
+
+  let mt; document.addEventListener('mousemove', ()=>{ document.body.classList.add('mouse'); clearTimeout(mt); mt = setTimeout(()=>document.body.classList.remove('mouse'), 2000); });
+  const hint = document.getElementById('hint'); hint.classList.add('show'); setTimeout(()=>hint.classList.remove('show'), 4000);
+
+  /* ---------- number formatting ---------- */
+  const nf0 = new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0});
+  const nf1 = new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1});
+  const nf2 = new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2});
+  function compact(v){
+    if(v >= 1e6) return nf2.format(v/1e6)+' млн';
+    if(v >= 1e5) return nf0.format(v/1e3)+' тыс.';
+    if(v >= 1e3) return nf1.format(v/1e3)+' тыс.';
+    return nf0.format(v);
+  }
+
+  /* ---------- column charts (single series each) ---------- */
+  const months = ['июнь','июль','авг.','сент.','окт.'];
+  function colChart(svgId, values, color, unit){
+    const svg = document.getElementById(svgId);
+    const plot = svg.parentElement;
+    const tip = plot.parentElement.querySelector('.tip');
+    const W = plot.clientWidth || 1000, H = plot.clientHeight || 240, L=64, R=10, T=30, B=34;
+    svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+    const maxV = Math.max.apply(null, values);
+    const raw = maxV/3, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const tick = [1,2,2.5,5,10].map(m=>m*mag).find(t=>t>=raw);
+    const top = Math.ceil(maxV/tick)*tick;
+    const y = v => T + (H-T-B) * (1 - v/top);
+    let g = '';
+    for(let t=0; t<=top+1e-9; t+=tick){
+      g += '<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(t)+'" y2="'+y(t)+'" stroke="var(--grid)" stroke-width="1"/>';
+      g += '<text class="axis-t" x="'+(L-14)+'" y="'+(y(t)+5)+'" text-anchor="end">'+(t>=1000? nf1.format(t/1000)+'K' : nf0.format(t))+'</text>';
+    }
+    const band = (W-L-R)/values.length, bw = 56, r = 6;
+    values.forEach((v,i)=>{
+      const x = L + band*i + (band-bw)/2, yy = y(v), base = y(0);
+      const d = 'M'+x+','+base+' V'+(yy+r)+' Q'+x+','+yy+' '+(x+r)+','+yy+' H'+(x+bw-r)+' Q'+(x+bw)+','+yy+' '+(x+bw)+','+(yy+r)+' V'+base+' Z';
+      g += '<path class="bar-mark" d="'+d+'" fill="'+color+'" style="transition-delay:'+(250+i*90)+'ms"/>';
+      g += '<text class="cap-t" x="'+(x+bw/2)+'" y="'+(yy-10)+'" text-anchor="middle">'+compact(v)+'</text>';
+      g += '<text class="x-t" x="'+(x+bw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+months[i]+'</text>';
+      g += '<rect data-i="'+i+'" x="'+(L+band*i)+'" y="'+T+'" width="'+band+'" height="'+(H-T-B)+'" fill="transparent"/>';
+    });
+    svg.innerHTML = g;
+    svg.querySelectorAll('rect[data-i]').forEach(rc=>{
+      rc.addEventListener('mouseenter', ()=>{
+        const i = +rc.dataset.i;
+        const cx = plot.offsetLeft + L + band*i + band/2;
+        const cy = plot.offsetTop + y(values[i]) - 34;
+        tip.innerHTML = '<b>'+months[i]+'</b> · '+nf0.format(values[i])+' '+unit;
+        tip.style.left = cx+'px'; tip.style.top = cy+'px'; tip.style.opacity = 1;
+      });
+      rc.addEventListener('mouseleave', ()=>{ tip.style.opacity = 0; });
+    });
+  }
+  colChart('ch-users', [11,14,18,17,25], 'var(--c-an)', 'пользователей');
+  colChart('ch-calls', [3375,7632,11667,9947,8616], 'var(--c-an)', 'вызовов');
+
+  /* ---------- calculator ---------- */
+  const SC = {
+    cons:{dev:.08, an:.08, sup:20, name:'осторожный'},
+    base:{dev:.12, an:.12, sup:30, name:'базовый'},
+    opt :{dev:.20, an:.18, sup:45, name:'оптимистичный'}
+  };
+  let sc = 'base';
+  const HOURS = 160;
+  const $ = id => document.getElementById(id);
+  const ins = ['dev','an','sup','rate'];
+  function fillTrack(el){ const p = (el.value-el.min)/(el.max-el.min)*100; el.style.setProperty('--p', p+'%'); }
+  function calc(){
+    const v = {}; ins.forEach(k=>{ const el=$('in-'+k); v[k]=+el.value; $('o-'+k).textContent = nf0.format(v[k]); fillTrack(el); });
+    const s = SC[sc];
+    const hDev = v.dev*HOURS*s.dev, hAn = v.an*HOURS*s.an, hSup = v.sup*s.sup/60;
+    const h = hDev+hAn+hSup, month = h*v.rate, year = month*12;
+    $('r-hours').textContent = nf0.format(Math.round(h));
+    $('r-month').textContent = compact(month);
+    $('r-year').textContent = compact(year);
+    $('r-fte').textContent = nf1.format(h/HOURS);
+    $('r-hyear').textContent = nf0.format(Math.round(h*12));
+    $('l-dev').textContent = nf0.format(Math.round(hDev));
+    $('l-an').textContent = nf0.format(Math.round(hAn));
+    $('l-sup').textContent = nf0.format(Math.round(hSup));
+    $('b-dev').style.flexGrow = hDev; $('b-an').style.flexGrow = hAn; $('b-sup').style.flexGrow = hSup;
+    $('b-dev').style.display = hDev>0?'':'none'; $('b-an').style.display = hAn>0?'':'none'; $('b-sup').style.display = hSup>0?'':'none';
+    $('assume').innerHTML = '<b>Как считаем (сценарий «'+s.name+'»):</b> разработчик и аналитик — '+HOURS+' ч/мес, из которых AI снимает '
+      + nf0.format(s.dev*100)+'% и '+nf0.format(s.an*100)+'% времени на поиск и разбор кода и текущей логики; поддержка — минус '
+      + s.sup+' мин диагностики на заявку. Это оценка, фактический эффект измеряем в пилоте. Для сравнения: до 58% времени разработчика — понимание кода (Xia et al., 2018); задача с AI-ассистентом — на 55,8% быстрее (Peng et al., 2023).';
+  }
+  ins.forEach(k=>$('in-'+k).addEventListener('input', calc));
+  document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click', ()=>{
+    sc = b.dataset.sc;
+    document.querySelectorAll('.seg button').forEach(x=>{ const on = x===b; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); });
+    calc();
+  }));
+  calc();
+})();
+</script>
+</body>
+</html>

@@ -363,6 +363,38 @@ input[type=range]:focus-visible{outline:2px solid var(--cyan);outline-offset:6px
 .hint{white-space:nowrap}
 @media (max-width:700px){.hint{display:none}}
 
+
+/* ---------- title contacts ---------- */
+.who{margin-top:64px;display:flex;gap:36px;flex-wrap:wrap;align-items:center;font:600 22px/1 var(--f-body);color:var(--text-2)}
+.who span,.who a{display:inline-flex;align-items:center;gap:12px;color:inherit;text-decoration:none}
+.who a:hover{color:var(--text)}
+.who svg{width:24px;height:24px;color:var(--lime)}
+
+/* ---------- developer demo ---------- */
+.devdemo{display:grid;grid-template-columns:1fr 560px;gap:36px;flex:1;min-height:0}
+.devdemo .msgs{padding:24px 30px;gap:16px}
+.devdemo .msg-u{font-size:21px;padding:16px 22px}
+.devdemo .log{font-size:16px;gap:8px}
+.devdemo .msg-a{font-size:19px;padding:20px 24px}
+.diff{margin:12px 0;padding:10px 0;border-radius:14px;background:#0a0e14;border:1px solid var(--line);font:500 15px/1.55 var(--f-mono);color:var(--text-2);overflow:hidden}
+.diff .file{display:block;padding:0 16px 8px;font-size:14px;color:var(--muted)}
+.diff div{display:grid;grid-template-columns:44px 22px 1fr;white-space:pre}
+.diff .ln{color:var(--muted);text-align:right;padding-right:10px}
+.diff .mk{text-align:center}
+.diff .del{background:rgba(255,138,138,.10);color:#ffc2c2}
+.diff .add{background:rgba(198,242,78,.08);color:#e2f7b5}
+.xcard{display:flex;flex-direction:column;gap:18px;padding:32px 32px}
+.xcard .tag{align-self:flex-start}
+.xcard h3{font:600 28px/1.2 var(--f-display)}
+.xq{padding:16px 20px;border-radius:18px 18px 18px 6px;background:linear-gradient(135deg,#2a2258,#1d2a44);font:500 19px/1.45 var(--f-body)}
+.xcard .checks{gap:14px}
+.xcard .checks li{font-size:18px}
+.xcard .checks .mono{font-size:16px;color:var(--violet)}
+.xfile{margin-top:auto;display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:16px;border:1px solid rgba(167,150,255,.3);background:rgba(125,92,255,.08)}
+.xfile b{display:block;font:600 17px/1.3 var(--f-mono);color:var(--text)}
+.xfile span{font:500 16px/1.3 var(--f-body);color:var(--text-2)}
+.xfile .dl{width:26px;height:26px;margin-left:auto;color:var(--violet);flex:none}
+
 /* ---------- print: one slide per page ---------- */
 @page{size:1920px 1080px;margin:0}
 @media print{
@@ -420,6 +452,10 @@ input[type=range]:focus-visible{outline:2px solid var(--cyan);outline-offset:6px
     <symbol id="i-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
     <symbol id="i-full" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></symbol>
     <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+        <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></symbol>
     <symbol id="i-git" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="9" r="3"/><path d="M6 9v6"/><path d="M18 12c0 3-3 4-9 4"/></symbol>
   </defs>
 </svg>
@@ -440,7 +476,11 @@ input[type=range]:focus-visible{outline:2px solid var(--cyan);outline-offset:6px
       <span class="chip"><svg class="i" style="color:var(--violet)"><use href="#i-doc"/></svg>Аналітика і ТЗ</span>
       <span class="chip"><svg class="i" style="color:var(--cyan)"><use href="#i-buoy"/></svg>Підтримка користувачів</span>
     </div>
-    <div class="date-line r" style="--d:5">ЖОВТЕНЬ 2026 · ПРЕЗЕНТАЦІЯ ДЛЯ ПАРТНЕРІВ</div>
+    <div class="who r" style="--d:5">
+      <span><svg class="i"><use href="#i-user"/></svg>Чорнобай Віталій</span>
+      <a href="https://t.me/chornobai1" target="_blank" rel="noopener"><svg class="i"><use href="#i-send"/></svg>t.me/chornobai1</a>
+      <a href="mailto:chornobai1@gmail.com"><svg class="i"><use href="#i-mail"/></svg>chornobai1@gmail.com</a>
+    </div>
   </div>
   <div class="right r" style="--d:2">
     <svg class="orbit" viewBox="0 0 760 760" aria-hidden="true">
@@ -617,6 +657,55 @@ input[type=range]:focus-visible{outline:2px solid var(--cyan);outline-offset:6px
       <div class="prompt r" style="--d:4"><div class="q"><span class="av" style="background:var(--lime-dim);color:var(--lime)">DEV</span>Яка процедура спрацьовує на кнопку «Заповнити» у формі замовлення?</div><div class="tools"><span class="tool l">form_events</span><span class="tool l">trace_form_handler</span></div></div>
       <div class="prompt r" style="--d:5"><div class="q"><span class="av" style="background:var(--lime-dim);color:var(--lime)">DEV</span>Де формуються рухи по регістру взаєморозрахунків?</div><div class="tools"><span class="tool l">search_code</span><span class="tool l">graph_context</span></div></div>
       <div class="prompt r" style="--d:6"><div class="q"><span class="av" style="background:var(--lime-dim);color:var(--lime)">DEV</span>Збери зовнішню обробку з цих вихідників і перевір XML</div><div class="tools"><span class="tool l">worker: build_epf</span><span class="tool l">validate_xml</span></div></div>
+    </div>
+  </div>
+  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
+</section>
+
+<!-- ============ DEV DEMO ============ -->
+<section class="slide g-left" data-title="Приклад для розробника" style="--g1c:rgba(198,242,78,.12)">
+  <div class="head" style="margin-bottom:32px">
+    <div class="eyebrow r" style="--d:0">Як це виглядає для розробника</div>
+    <h2 class="r" style="--d:1">Від задачі — до готового коду</h2>
+  </div>
+  <div class="devdemo">
+    <div class="chat r" style="--d:2">
+      <div class="bar"><i></i><i></i><i></i><span>AI-асистент · підключено onec-ai</span></div>
+      <div class="msgs">
+        <div class="msg-u r" style="--d:3">Заборони проводити реалізацію, якщо клієнт у стоп-листі. Що і де змінити?</div>
+        <div class="log">
+          <div class="r" style="--d:5"><svg class="i"><use href="#i-check"/></svg>search_code «стоп-лист клієнта» <em>— СтопЛистСервер.КлиентЗаблокирован()</em></div>
+          <div class="r" style="--d:6"><svg class="i"><use href="#i-check"/></svg>find_callers ОбработкаПроведения <em>— 3 виклики</em></div>
+          <div class="r" style="--d:7"><svg class="i"><use href="#i-check"/></svg>impact_analysis РеализацияТоваровУслуг <em>— 2 звіти й обмін лише читають документ</em></div>
+        </div>
+        <div class="msg-a r" style="--d:9">
+          <p><b>Де:</b> <code>РеализацияТоваровУслуг</code> → модуль об’єкта, <code>ОбработкаПроведения()</code>, рядок 42. Замініть перевірку прапорця на загальну функцію стоп-листа:</p>
+          <div class="diff">
+            <span class="file">Documents/РеализацияТоваровУслуг/Ext/ObjectModule.bsl</span>
+            <div><span class="ln">41</span><span class="mk"> </span><span>Процедура ОбработкаПроведения(Отказ, РежимПроведения)</span></div>
+            <div class="del"><span class="ln">42</span><span class="mk">−</span><span>    Если Контрагент.Заблокирован Тогда</span></div>
+            <div class="add"><span class="ln">42</span><span class="mk">+</span><span>    Если СтопЛистСервер.КлиентЗаблокирован(Контрагент, Дата) Тогда</span></div>
+            <div class="add"><span class="ln">43</span><span class="mk">+</span><span>        ОбщегоНазначения.СообщитьПользователю(</span></div>
+            <div class="add"><span class="ln">44</span><span class="mk">+</span><span>            НСтр("ru = 'Клиент в стоп-листе'"),, "Контрагент");</span></div>
+            <div><span class="ln">45</span><span class="mk"> </span><span>        Отказ = Истина;</span></div>
+            <div><span class="ln">46</span><span class="mk"> </span><span>    КонецЕсли;</span></div>
+          </div>
+          <p><b>Вплив:</b> звіти й обмін документ лише читають — зміна їх не зламає. Патч збережено як чернетку, у Конфігуратор його переносите ви.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card xcard glow-v r" style="--d:6">
+      <span class="tag">Або — нова обробка</span>
+      <h3>Зовнішня обробка за хвилини</h3>
+      <div class="xq">Створи зовнішню обробку: завантаження цін постачальника з Excel</div>
+      <ul class="checks v">
+        <li><svg class="i"><use href="#i-check"/></svg><span>Згенеровано форму, модуль і макет</span></li>
+        <li><svg class="i"><use href="#i-check"/></svg><span><span class="mono">worker_upload_staging</span> — вихідники на агенті</span></li>
+        <li><svg class="i"><use href="#i-check"/></svg><span><span class="mono">build_epf</span> — збірка на вашій платформі 1С</span></li>
+        <li><svg class="i"><use href="#i-check"/></svg><span>XML перевірено, помилок немає</span></li>
+      </ul>
+      <div class="xfile"><div class="ico v"><svg class="i"><use href="#i-file"/></svg></div><div><b>ЗагрузкаЦенПоставщика.epf</b><span>готово · посилання на завантаження</span></div><svg class="i dl"><use href="#i-download"/></svg></div>
+      <p class="small">Ілюстративний приклад. Назви об’єктів умовні.</p>
     </div>
   </div>
   <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
@@ -864,17 +953,6 @@ input[type=range]:focus-visible{outline:2px solid var(--cyan);outline-offset:6px
     <div class="card phase glow-l r" style="--d:5"><div class="w">Тижні 3–8</div><h3>Робота і заміри</h3><p class="p">Щотижневий зворотний зв’язок, статистика використання, фіксація прикладів «було / стало».</p><div class="bar"><i style="width:100%"></i></div></div>
   </div>
   <div class="outcome r" style="--d:6"><div class="ico"><svg class="i"><use href="#i-trend"/></svg></div><p class="p">Результат пілоту — звіт із виміряною економією годин, вашими прикладами і рішенням про масштабування на всю команду.</p></div>
-  <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
-</section>
-
-<!-- ============ 17. CTA ============ -->
-<section class="slide s-cta g-center" data-title="Наступний крок" style="--g1c:rgba(198,242,78,.16);--g2c:rgba(125,92,255,.16)">
-  <div class="contact r" style="--d:4">
-    <svg style="width:64px;height:64px"><use href="#logo"/></svg>
-    <div><div class="k">Контакт</div><div class="ph">Чорнобай Віталій , Lead 1С Developer & AI Engineer </div></div>
-    <div><div class="k">Telegram</div><div class="ph">https://t.me/chornobai1</div></div>
-    <div><div class="k">Email</div><div class="ph">chornobai1@gmail.com</div></div>
-  </div>
   <div class="foot"><span class="wm"><svg><use href="#logo"/></svg>onec-ai</span><span class="pg"></span></div>
 </section>
 
